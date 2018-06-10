@@ -1,12 +1,13 @@
 [package]
-name = "matches"
+name = "matches2"
 version = "0.1.7"
-authors = ["Simon Sapin <simon.sapin@exyr.org>"]
+authors = ["Las <las@protonmail.ch>", "Simon Sapin <simon.sapin@exyr.org>"]
 license = "MIT"
-repository = "https://github.com/SimonSapin/rust-std-candidates"
+repository = "https://github.com/Laaas/matches2"
 description = "A macro to evaluate, as a boolean, whether an expression matches a pattern."
-documentation = "https://docs.rs/matches/"
+documentation = "https://docs.rs/matches2/"
+keywords = ["macro", "patterns"]
 
 [lib]
-name = "matches"
+name = "matches2"
 path = "lib.rs"
