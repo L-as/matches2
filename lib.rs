@@ -91,10 +91,10 @@ macro_rules! unwrap_match {
 /// ```
 #[macro_export]
 macro_rules! assert_matches {
-	($expression:expr, $($pattern:tt)+) => {
+	($expression:expr, $(|)* $pattern:pat $(|$pattern_extra:pat)* $(if $ifguard:expr)*) => {
 		match $expression {
-			$($pattern)+ => (),
-			ref e => panic!("assertion failed: `{:?}` does not match `{}`", e, stringify!($($pattern)+)),
+			$pattern $(|$pattern_extra)* $(if $ifguard)* => (),
+			_ => panic!("assertion failed: `{:?}` does not match `{}`", $expression, stringify!($pattern $(|$pattern_extra)* $(if $ifguard)*))
 		}
 	}
 }
