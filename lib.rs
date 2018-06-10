@@ -51,34 +51,28 @@ macro_rules! matches {
 /// #[macro_use]
 /// extern crate matches2;
 ///
+/// #[derive(Debug)]
 /// pub enum Foo<T> {
-///     A,
+///     A(T),
 ///     B(T),
 /// }
 ///
 /// fn main() {
 ///     let foo = Foo::B(4);
-///     let i = unwrap_match!(foo, Foo::B(i) => i);
+///     let i = unwrap_match!(foo, Foo::B(i) | Foo::A(i) => i);
 ///     assert_eq!(i, 4);
 /// }
 /// ```
 #[macro_export]
 macro_rules! unwrap_match {
-    ($expression:expr, $($pattern:tt)+) => {
+    ($expression:expr, $(|)* $pattern:pat $(|$pattern_extra:pat)* => $result:expr) => {
         _matches_tt_as_expr_hack! {
             match $expression {
-                $($pattern)+,
-                _ => panic!("pattern {} passed to unwrap_match! did not match", stringify!($($pattern)+)),
+                $pattern $(|$pattern_extra)* => $result,
+                _ => panic!("assertion failed: `{:?}` does not match `{}`", $expression, stringify!($pattern $(|$pattern_extra)*))
             }
         }
     }
-}
-
-/// Work around "error: unexpected token: `an interpolated tt`", whatever that means.
-#[doc(hidden)]
-#[macro_export]
-macro_rules! _matches_tt_as_expr_hack {
-    ($value:expr) => ($value)
 }
 
 /// Assert that an expression matches a refutable pattern.
@@ -136,6 +130,13 @@ macro_rules! debug_assert_matches {
     ($($arg:tt)*) => (if cfg!(debug_assertions) { assert_matches!($($arg)*); })
 }
 
+/// Work around "error: unexpected token: `an interpolated tt`", whatever that means.
+#[doc(hidden)]
+#[macro_export]
+macro_rules! _matches_tt_as_expr_hack {
+    ($value:expr) => ($value)
+}
+
 #[test]
 fn matches_works() {
     let foo = Some("-12");
@@ -167,6 +168,7 @@ fn assert_matches_panics() {
 #[test]
 fn unwrap_match_works() {
     #[allow(dead_code)]
+    #[derive(Debug)]
     enum Foo {
         A(u32),
         B(f32),
@@ -178,9 +180,10 @@ fn unwrap_match_works() {
 }
 
 #[test]
-#[should_panic(expected = "pattern Foo :: A ( i ) => i passed to unwrap_match! did not match")]
+#[should_panic(expected = "assertion failed: `B(0.5)` does not match `Foo::A(i)`")]
 fn unwrap_match_panics() {
     #[allow(dead_code)]
+    #[derive(Debug)]
     enum Foo {
         A(u32),
         B(f32),
