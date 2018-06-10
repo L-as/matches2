@@ -59,17 +59,17 @@ macro_rules! matches {
 ///
 /// fn main() {
 ///     let foo = Foo::B(4);
-///     let i = unwrap_match!(foo, Foo::B(i) | Foo::A(i) => i);
+///     let i = unwrap_match!(foo, Foo::B(i) | Foo::A(i) if i < 100 => i);
 ///     assert_eq!(i, 4);
 /// }
 /// ```
 #[macro_export]
 macro_rules! unwrap_match {
-	($expression:expr, $(|)* $pattern:pat $(|$pattern_extra:pat)* => $result:expr) => {
+	($expression:expr, $(|)* $pattern:pat $(|$pattern_extra:pat)* $(if $ifguard:expr)* => $result:expr) => {
 		_matches_tt_as_expr_hack! {
 			match $expression {
-				$pattern $(|$pattern_extra)* => $result,
-				_ => panic!("assertion failed: `{:?}` does not match `{}`", $expression, stringify!($pattern $(|$pattern_extra)*))
+				$pattern $(|$pattern_extra)* $(if $ifguard)* => $result,
+				_ => panic!("assertion failed: `{:?}` does not match `{}`", $expression, stringify!($pattern $(|$pattern_extra)* $(if $ifguard)*))
 			}
 		}
 	}
@@ -180,7 +180,7 @@ fn unwrap_match_works() {
 }
 
 #[test]
-#[should_panic(expected = "assertion failed: `B(0.5)` does not match `Foo::A(i)`")]
+#[should_panic(expected = "assertion failed: `B(0.5)` does not match `Foo::A(i) if i < 10`")]
 fn unwrap_match_panics() {
 	#[allow(dead_code)]
 	#[derive(Debug)]
@@ -190,5 +190,5 @@ fn unwrap_match_panics() {
 	}
 
 	let foo = Foo::B(0.5);
-	let _i = unwrap_match!(foo, Foo::A(i) => i);
+	let _i = unwrap_match!(foo, Foo::A(i) if i < 10 => i);
 }
