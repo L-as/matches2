@@ -30,11 +30,9 @@
 #[macro_export]
 macro_rules! matches {
 	($expression:expr, $($pattern:tt)+) => {
-		_matches_tt_as_expr_hack! {
-			match $expression {
-				$($pattern)+ => true,
-				_ => false
-			}
+		match $expression {
+			$($pattern)+ => true,
+			_ => false
 		}
 	}
 }
@@ -66,11 +64,9 @@ macro_rules! matches {
 #[macro_export]
 macro_rules! unwrap_match {
 	($expression:expr, $(|)* $pattern:pat $(|$pattern_extra:pat)* $(if $ifguard:expr)* => $result:expr) => {
-		_matches_tt_as_expr_hack! {
-			match $expression {
-				$pattern $(|$pattern_extra)* $(if $ifguard)* => $result,
-				_ => panic!("assertion failed: `{:?}` does not match `{}`", $expression, stringify!($pattern $(|$pattern_extra)* $(if $ifguard)*))
-			}
+		match $expression {
+			$pattern $(|$pattern_extra)* $(if $ifguard)* => $result,
+			_ => panic!("assertion failed: `{:?}` does not match `{}`", $expression, stringify!($pattern $(|$pattern_extra)* $(if $ifguard)*))
 		}
 	}
 }
@@ -96,11 +92,9 @@ macro_rules! unwrap_match {
 #[macro_export]
 macro_rules! assert_matches {
 	($expression:expr, $($pattern:tt)+) => {
-		_matches_tt_as_expr_hack! {
-			match $expression {
-				$($pattern)+ => (),
-				ref e => panic!("assertion failed: `{:?}` does not match `{}`", e, stringify!($($pattern)+)),
-			}
+		match $expression {
+			$($pattern)+ => (),
+			ref e => panic!("assertion failed: `{:?}` does not match `{}`", e, stringify!($($pattern)+)),
 		}
 	}
 }
@@ -128,13 +122,6 @@ macro_rules! assert_matches {
 #[macro_export]
 macro_rules! debug_assert_matches {
 	($($arg:tt)*) => (if cfg!(debug_assertions) { assert_matches!($($arg)*); })
-}
-
-/// Work around "error: unexpected token: `an interpolated tt`", whatever that means.
-#[doc(hidden)]
-#[macro_export]
-macro_rules! _matches_tt_as_expr_hack {
-	($value:expr) => ($value)
 }
 
 #[test]
