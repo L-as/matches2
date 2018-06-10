@@ -8,7 +8,7 @@
 ///
 /// ```
 /// #[macro_use]
-/// extern crate matches;
+/// extern crate matches2;
 ///
 /// pub enum Foo<T> {
 ///     A,
@@ -49,7 +49,7 @@ macro_rules! matches {
 ///
 /// ```
 /// #[macro_use]
-/// extern crate matches;
+/// extern crate matches2;
 ///
 /// pub enum Foo<T> {
 ///     A,
@@ -92,7 +92,7 @@ macro_rules! _matches_tt_as_expr_hack {
 ///
 /// ```
 /// #[macro_use]
-/// extern crate matches;
+/// extern crate matches2;
 ///
 /// fn main() {
 ///     let data = [1, 2, 3];
@@ -124,7 +124,7 @@ macro_rules! assert_matches {
 ///
 /// ```
 /// #[macro_use]
-/// extern crate matches;
+/// extern crate matches2;
 ///
 /// fn main() {
 ///     let data = [1, 2, 3];
