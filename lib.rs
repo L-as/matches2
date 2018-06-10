@@ -29,14 +29,14 @@
 /// ```
 #[macro_export]
 macro_rules! matches {
-    ($expression:expr, $($pattern:tt)+) => {
-        _matches_tt_as_expr_hack! {
-            match $expression {
-                $($pattern)+ => true,
-                _ => false
-            }
-        }
-    }
+	($expression:expr, $($pattern:tt)+) => {
+		_matches_tt_as_expr_hack! {
+			match $expression {
+				$($pattern)+ => true,
+				_ => false
+			}
+		}
+	}
 }
 
 /// A general version of Option::unwrap for all enum variants.
@@ -65,14 +65,14 @@ macro_rules! matches {
 /// ```
 #[macro_export]
 macro_rules! unwrap_match {
-    ($expression:expr, $(|)* $pattern:pat $(|$pattern_extra:pat)* => $result:expr) => {
-        _matches_tt_as_expr_hack! {
-            match $expression {
-                $pattern $(|$pattern_extra)* => $result,
-                _ => panic!("assertion failed: `{:?}` does not match `{}`", $expression, stringify!($pattern $(|$pattern_extra)*))
-            }
-        }
-    }
+	($expression:expr, $(|)* $pattern:pat $(|$pattern_extra:pat)* => $result:expr) => {
+		_matches_tt_as_expr_hack! {
+			match $expression {
+				$pattern $(|$pattern_extra)* => $result,
+				_ => panic!("assertion failed: `{:?}` does not match `{}`", $expression, stringify!($pattern $(|$pattern_extra)*))
+			}
+		}
+	}
 }
 
 /// Assert that an expression matches a refutable pattern.
@@ -95,14 +95,14 @@ macro_rules! unwrap_match {
 /// ```
 #[macro_export]
 macro_rules! assert_matches {
-    ($expression:expr, $($pattern:tt)+) => {
-        _matches_tt_as_expr_hack! {
-            match $expression {
-                $($pattern)+ => (),
-                ref e => panic!("assertion failed: `{:?}` does not match `{}`", e, stringify!($($pattern)+)),
-            }
-        }
-    }
+	($expression:expr, $($pattern:tt)+) => {
+		_matches_tt_as_expr_hack! {
+			match $expression {
+				$($pattern)+ => (),
+				ref e => panic!("assertion failed: `{:?}` does not match `{}`", e, stringify!($($pattern)+)),
+			}
+		}
+	}
 }
 
 /// Assert that an expression matches a refutable pattern using debug assertions.
@@ -127,68 +127,68 @@ macro_rules! assert_matches {
 /// ```
 #[macro_export]
 macro_rules! debug_assert_matches {
-    ($($arg:tt)*) => (if cfg!(debug_assertions) { assert_matches!($($arg)*); })
+	($($arg:tt)*) => (if cfg!(debug_assertions) { assert_matches!($($arg)*); })
 }
 
 /// Work around "error: unexpected token: `an interpolated tt`", whatever that means.
 #[doc(hidden)]
 #[macro_export]
 macro_rules! _matches_tt_as_expr_hack {
-    ($value:expr) => ($value)
+	($value:expr) => ($value)
 }
 
 #[test]
 fn matches_works() {
-    let foo = Some("-12");
-    assert!(matches!(foo, Some(bar) if
-        matches!(bar.as_bytes()[0], b'+' | b'-') &&
-        matches!(bar.as_bytes()[1], b'0'...b'9')
-    ));
+	let foo = Some("-12");
+	assert!(matches!(foo, Some(bar) if
+		matches!(bar.as_bytes()[0], b'+' | b'-') &&
+		matches!(bar.as_bytes()[1], b'0'...b'9')
+	));
 }
 
 #[test]
 fn assert_matches_works() {
-    let foo = Some("-12");
-    assert_matches!(foo, Some(bar) if
-        matches!(bar.as_bytes()[0], b'+' | b'-') &&
-        matches!(bar.as_bytes()[1], b'0'...b'9')
-    );
+	let foo = Some("-12");
+	assert_matches!(foo, Some(bar) if
+		matches!(bar.as_bytes()[0], b'+' | b'-') &&
+		matches!(bar.as_bytes()[1], b'0'...b'9')
+	);
 }
 
 #[test]
 #[should_panic(expected = "assertion failed: `Some(\"-AB\")` does not match ")]
 fn assert_matches_panics() {
-    let foo = Some("-AB");
-    assert_matches!(foo, Some(bar) if
-        matches!(bar.as_bytes()[0], b'+' | b'-') &&
-        matches!(bar.as_bytes()[1], b'0'...b'9')
-    );
+	let foo = Some("-AB");
+	assert_matches!(foo, Some(bar) if
+		matches!(bar.as_bytes()[0], b'+' | b'-') &&
+		matches!(bar.as_bytes()[1], b'0'...b'9')
+	);
 }
 
 #[test]
 fn unwrap_match_works() {
-    #[allow(dead_code)]
-    #[derive(Debug)]
-    enum Foo {
-        A(u32),
-        B(f32),
-    }
+	#[allow(dead_code)]
+	#[derive(Debug)]
+	enum Foo {
+		A(u32),
+		B(f32),
+	}
 
-    let foo = Foo::B(0.5);
-    let f = unwrap_match!(foo, Foo::B(f) => f);
-    assert_eq!(f, 0.5);
+	let foo = Foo::B(0.5);
+	let f = unwrap_match!(foo, Foo::B(f) => f);
+	assert_eq!(f, 0.5);
 }
 
 #[test]
 #[should_panic(expected = "assertion failed: `B(0.5)` does not match `Foo::A(i)`")]
 fn unwrap_match_panics() {
-    #[allow(dead_code)]
-    #[derive(Debug)]
-    enum Foo {
-        A(u32),
-        B(f32),
-    }
+	#[allow(dead_code)]
+	#[derive(Debug)]
+	enum Foo {
+		A(u32),
+		B(f32),
+	}
 
-    let foo = Foo::B(0.5);
-    let _i = unwrap_match!(foo, Foo::A(i) => i);
+	let foo = Foo::B(0.5);
+	let _i = unwrap_match!(foo, Foo::A(i) => i);
 }
