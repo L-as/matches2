@@ -1,5 +1,8 @@
 # matches2
 
+[![Crates.io](https://img.shields.io/crates/v/matches2.svg)](https://crates.io/crates/matches2)
+[![License](https://img.shields.io/crates/l/matches2.svg)](https://raw.githubusercontent.com/Laaas/matches2/master/LICENSE)
+
 This is a fork of the matches crate with an extra `unwrap_match!` macro,
 and also better error messages for `assert_matches`.
 
