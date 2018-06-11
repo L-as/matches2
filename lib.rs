@@ -124,58 +124,61 @@ macro_rules! debug_assert_matches {
 	($($arg:tt)*) => (if cfg!(debug_assertions) { assert_matches!($($arg)*); })
 }
 
-#[test]
-fn matches_works() {
-	let foo = Some("-12");
-	assert!(matches!(foo, Some(bar) if
-		matches!(bar.as_bytes()[0], b'+' | b'-') &&
-		matches!(bar.as_bytes()[1], b'0'...b'9')
-	));
-}
-
-#[test]
-fn assert_matches_works() {
-	let foo = Some("-12");
-	assert_matches!(foo, Some(bar) if
-		matches!(bar.as_bytes()[0], b'+' | b'-') &&
-		matches!(bar.as_bytes()[1], b'0'...b'9')
-	);
-}
-
-#[test]
-#[should_panic(expected = "assertion failed: `Some(\"-AB\")` does not match ")]
-fn assert_matches_panics() {
-	let foo = Some("-AB");
-	assert_matches!(foo, Some(bar) if
-		matches!(bar.as_bytes()[0], b'+' | b'-') &&
-		matches!(bar.as_bytes()[1], b'0'...b'9')
-	);
-}
-
-#[test]
-fn unwrap_match_works() {
-	#[allow(dead_code)]
-	#[derive(Debug)]
-	enum Foo {
-		A(u32),
-		B(f32),
+#[cfg(test)]
+mod tests {
+	#[test]
+	fn matches_works() {
+		let foo = Some("-12");
+		assert!(matches!(foo, Some(bar) if
+			matches!(bar.as_bytes()[0], b'+' | b'-') &&
+			matches!(bar.as_bytes()[1], b'0'...b'9')
+		));
 	}
 
-	let foo = Foo::B(0.5);
-	let f = unwrap_match!(foo, Foo::B(f) => f);
-	assert_eq!(f, 0.5);
-}
-
-#[test]
-#[should_panic(expected = "assertion failed: `B(0.5)` does not match `Foo::A(i) if i < 10`")]
-fn unwrap_match_panics() {
-	#[allow(dead_code)]
-	#[derive(Debug)]
-	enum Foo {
-		A(u32),
-		B(f32),
+	#[test]
+	fn assert_matches_works() {
+		let foo = Some("-12");
+		assert_matches!(foo, Some(bar) if
+			matches!(bar.as_bytes()[0], b'+' | b'-') &&
+			matches!(bar.as_bytes()[1], b'0'...b'9')
+		);
 	}
 
-	let foo = Foo::B(0.5);
-	let _i = unwrap_match!(foo, Foo::A(i) if i < 10 => i);
+	#[test]
+	#[should_panic(expected = "assertion failed: `Some(\"-AB\")` does not match ")]
+	fn assert_matches_panics() {
+		let foo = Some("-AB");
+		assert_matches!(foo, Some(bar) if
+			matches!(bar.as_bytes()[0], b'+' | b'-') &&
+			matches!(bar.as_bytes()[1], b'0'...b'9')
+		);
+	}
+
+	#[test]
+	fn unwrap_match_works() {
+		#[allow(dead_code)]
+		#[derive(Debug)]
+		enum Foo {
+			A(u32),
+			B(f32),
+		}
+
+		let foo = Foo::B(0.5);
+		let f = unwrap_match!(foo, Foo::B(f) => f);
+		assert_eq!(f, 0.5);
+	}
+
+	#[test]
+	#[should_panic(expected = "assertion failed: `B(0.5)` does not match `Foo::A(i) if i < 10`")]
+	fn unwrap_match_panics() {
+		#[allow(dead_code)]
+		#[derive(Debug)]
+		enum Foo {
+			A(u32),
+			B(f32),
+		}
+
+		let foo = Foo::B(0.5);
+		let _i = unwrap_match!(foo, Foo::A(i) if i < 10 => i);
+	}
 }
