@@ -39,9 +39,11 @@ macro_rules! matches {
 
 /// A general version of Option::unwrap for all enum variants.
 ///
-/// Syntax: `unwrap_match!(` *expression* `,` *pattern* `=>` *result* `)`
+/// Syntax: `unwrap_match!(` *expression* `,` *pattern* `=>` *result* [, *error message* ]`)`
 ///
-/// The macro evaluates to *result* if *pattern* matches, otherwise it panics.
+/// The macro evaluates to *result* if *pattern* matches, otherwise it panics with the *error message* or a default one
+/// that contains the pattern in it.
+/// NB: The error message is passed through to panic! verbatim, so you can do `unwrap_match!(..., "{}", 2)`.
 ///
 /// # Examples
 ///
@@ -57,7 +59,7 @@ macro_rules! matches {
 ///
 /// fn main() {
 ///     let foo = Foo::B(4);
-///     let i = unwrap_match!(foo, Foo::B(i) | Foo::A(i) if i < 100 => i);
+///     let i = unwrap_match!(foo, Foo::B(i) | Foo::A(i) if i < 100 => i, "An error message, omittable");
 ///     assert_eq!(i, 4);
 /// }
 /// ```
@@ -68,15 +70,22 @@ macro_rules! unwrap_match {
 			$pattern $(|$pattern_extra)* $(if $ifguard)* => $result,
 			_ => panic!("assertion failed: `{:?}` does not match `{}`", $expression, stringify!($pattern $(|$pattern_extra)* $(if $ifguard)*))
 		}
+	};
+	($expression:expr, $(|)* $pattern:pat $(|$pattern_extra:pat)* $(if $ifguard:expr)* => $result:expr, $($msg:tt)+) => {
+		match $expression {
+			$pattern $(|$pattern_extra)* $(if $ifguard)* => $result,
+			_ => panic!($($msg)+)
+		}
 	}
 }
 
 /// Assert that an expression matches a refutable pattern.
 ///
-/// Syntax: `assert_matches!(` *expression* `,` *pattern* `)`
+/// Syntax: `assert_matches!(` *expression* `,` *pattern* [, *error message* ]`)`
 ///
-/// Panic with a message that shows the expression if it does not match the
-/// pattern.
+/// If the pattern does not match, this macro panics with the given error message or a default one
+/// that contains the pattern in it.
+/// NB: The error message is passed through to panic! verbatim, so you can do `assert_matches!(..., "{}", 2)`.
 ///
 /// # Examples
 ///
@@ -96,17 +105,22 @@ macro_rules! assert_matches {
 			$pattern $(|$pattern_extra)* $(if $ifguard)* => (),
 			_ => panic!("assertion failed: `{:?}` does not match `{}`", $expression, stringify!($pattern $(|$pattern_extra)* $(if $ifguard)*))
 		}
+	};
+	($expression:expr, $(|)* $pattern:pat $(|$pattern_extra:pat)* $(if $ifguard:expr)*, $($msg:tt)+) => {
+		match $expression {
+			$pattern $(|$pattern_extra)* $(if $ifguard)* => (),
+			_ => panic!($($msg)+)
+		}
 	}
 }
 
 /// Assert that an expression matches a refutable pattern using debug assertions.
 ///
-/// Syntax: `debug_assert_matches!(` *expression* `,` *pattern* `)`
+/// Syntax: `debug_assert_matches!(` *expression* `,` *pattern* [, *error message* ]`)`
 ///
-/// If debug assertions are enabled, panic with a message that shows the
-/// expression if it does not match the pattern.
-///
-/// When debug assertions are not enabled, this macro does nothing.
+/// If the pattern does not match while debug assertions are enabled, this macro panics with
+/// the given error message or a default one that contains the pattern in it.
+/// NB: The error message is passed through to panic! verbatim, so you can do `debug_assert_matches!(..., "{}", 2)`.
 ///
 /// # Examples
 ///
@@ -116,7 +130,7 @@ macro_rules! assert_matches {
 ///
 /// fn main() {
 ///     let data = [1, 2, 3];
-///     debug_assert_matches!(data.get(1), Some(_));
+///     debug_assert_matches!(data.get(1), Some(_), "This is not supposed to happen");
 /// }
 /// ```
 #[macro_export]
