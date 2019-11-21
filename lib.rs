@@ -79,6 +79,38 @@ macro_rules! unwrap_match {
 	}
 }
 
+/// Returns Option::Some if pattern matches with the inner value, or Option::None otherwise
+///
+/// This macro is especially useful with `Iterator::filter_map`.
+///
+/// # Examples
+/// ```
+/// #[macro_use]
+/// extern crate matches2;
+///
+/// enum Foo {
+///     A(i32),
+///     B(f64),
+/// }
+///
+/// fn main() {
+///     let data = [Foo::A(1), Foo::B(2.0), Foo::A(3), Foo::B(4.0), Foo::A(5)];
+///     let vec = data.iter()
+///         .filter_map(|foo| option_match!(foo, &Foo::A(i) if i <= 3 => i))
+///         .collect::<Vec<i32>>();
+///     assert_eq!(&vec[..], &[1, 3]);
+/// }
+/// ```
+#[macro_export]
+macro_rules! option_match {
+    ($expression:expr, $($pattern:pat)|* $(if $ifguard:expr)? => $result:expr) => {
+        match $expression {
+            $($pattern)|* $(if $ifguard)? => Some($result),
+            _ => None
+        }
+    };
+}
+
 /// Assert that an expression matches a refutable pattern.
 ///
 /// Syntax: `assert_matches!(` *expression* `,` *pattern* [, *error message* ]`)`
