@@ -65,18 +65,18 @@ macro_rules! matches {
 /// ```
 #[macro_export]
 macro_rules! unwrap_match {
-    ($expression:expr, $(|)* $pattern:pat $(|$pattern_extra:pat)* $(if $ifguard:expr)* => $result:expr) => {
+    ($expression:expr, $($pattern:pat)|* $(if $ifguard:expr)? => $result:expr) => {
         match $expression {
-            $pattern $(|$pattern_extra)* $(if $ifguard)* => $result,
-            _ => panic!("assertion failed: `{:?}` does not match `{}`", $expression, stringify!($pattern $(|$pattern_extra)* $(if $ifguard)*))
+            $($pattern)|* $(if $ifguard)? => $result,
+            _ => panic!("assertion failed: `{:?}` does not match `{}`", $expression, stringify!($($pattern)|* $(if $ifguard)?))
         }
     };
-    ($expression:expr, $(|)* $pattern:pat $(|$pattern_extra:pat)* $(if $ifguard:expr)* => $result:expr, $($msg:tt)+) => {
+    ($expression:expr, $($pattern:pat)|* $(if $ifguard:expr)? => $result:expr, $($msg:tt)+) => {
         match $expression {
-            $pattern $(|$pattern_extra)* $(if $ifguard)* => $result,
+            $($pattern)|* $(if $ifguard)? => $result,
             _ => panic!($($msg)+)
         }
-    }
+    };
 }
 
 /// Returns Option::Some if pattern matches with the inner value, or Option::None otherwise
@@ -132,18 +132,18 @@ macro_rules! option_match {
 /// ```
 #[macro_export]
 macro_rules! assert_matches {
-    ($expression:expr, $(|)* $pattern:pat $(|$pattern_extra:pat)* $(if $ifguard:expr)*) => {
+    ($expression:expr, $($pattern:pat)|* $(if $ifguard:expr)? => $result:expr) => {
         match $expression {
-            $pattern $(|$pattern_extra)* $(if $ifguard)* => (),
-            _ => panic!("assertion failed: `{:?}` does not match `{}`", $expression, stringify!($pattern $(|$pattern_extra)* $(if $ifguard)*))
+            $($pattern)|* $(if $ifguard)? => (),
+            _ => panic!("assertion failed: `{:?}` does not match `{}`", $expression, stringify!($($pattern)|* $(if $ifguard)?))
         }
     };
-    ($expression:expr, $(|)* $pattern:pat $(|$pattern_extra:pat)* $(if $ifguard:expr)*, $($msg:tt)+) => {
+    ($expression:expr, $($pattern:pat)|* $(if $ifguard:expr)? => $result:expr, $($msg:tt)+) => {
         match $expression {
-            $pattern $(|$pattern_extra)* $(if $ifguard)* => (),
+            $($pattern)|* $(if $ifguard)? => (),
             _ => panic!($($msg)+)
         }
-    }
+    };
 }
 
 /// Assert that an expression matches a refutable pattern using debug assertions.
