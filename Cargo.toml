@@ -1,6 +1,6 @@
 [package]
 name          = "matches2"
-version       = "1.1.0"
+version       = "1.2.0"
 authors       = ["Las <las@protonmail.ch>", "Simon Sapin <simon.sapin@exyr.org>"]
 license       = "MIT"
 readme        = "README.md"
