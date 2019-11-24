@@ -132,13 +132,13 @@ macro_rules! option_match {
 /// ```
 #[macro_export]
 macro_rules! assert_matches {
-    ($expression:expr, $($pattern:pat)|* $(if $ifguard:expr)? => $result:expr) => {
+    ($expression:expr, $($pattern:pat)|* $(if $ifguard:expr)?) => {
         match $expression {
             $($pattern)|* $(if $ifguard)? => (),
             _ => panic!("assertion failed: `{:?}` does not match `{}`", $expression, stringify!($($pattern)|* $(if $ifguard)?))
         }
     };
-    ($expression:expr, $($pattern:pat)|* $(if $ifguard:expr)? => $result:expr, $($msg:tt)+) => {
+    ($expression:expr, $($pattern:pat)|* $(if $ifguard:expr)?, $($msg:tt)+) => {
         match $expression {
             $($pattern)|* $(if $ifguard)? => (),
             _ => panic!($($msg)+)
@@ -165,9 +165,26 @@ macro_rules! assert_matches {
 ///     debug_assert_matches!(data.get(1), Some(_), "This is not supposed to happen");
 /// }
 /// ```
+#[cfg(debug_assertions)]
 #[macro_export]
 macro_rules! debug_assert_matches {
-    ($($arg:tt)*) => (if cfg!(debug_assertions) { assert_matches!($($arg)*); })
+    ($expression:expr, $($pattern:pat)|* $(if $ifguard:expr)?) => {
+        if cfg!(debug_assertions) match $expression {
+            $($pattern)|* $(if $ifguard)? => (),
+            _ => panic!("assertion failed: `{:?}` does not match `{}`", $expression, stringify!($($pattern)|* $(if $ifguard)?))
+        }
+    };
+    ($expression:expr, $($pattern:pat)|* $(if $ifguard:expr)?, $($msg:tt)+) => {
+        match $expression {
+            $($pattern)|* $(if $ifguard)? => (),
+            _ => panic!($($msg)+)
+        }
+    };
+}
+#[cfg(not(debug_assertions))]
+#[macro_export]
+macro_rules! debug_assert_matches {
+    ($expression:expr, $($pattern:pat)|* $(if $ifguard:expr)? $(, $($msg:tt)+)?) => {};
 }
 
 #[cfg(test)]
