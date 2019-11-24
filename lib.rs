@@ -29,12 +29,12 @@
 /// ```
 #[macro_export]
 macro_rules! matches {
-    ($expression:expr, $($pattern:tt)+) => {
+    ($expression:expr, $($pattern:pat)|* $(if $ifguard:expr)?) => {
         match $expression {
-            $($pattern)+ => true,
+            $($pattern)|* $(if $ifguard)? => true,
             _ => false
         }
-    }
+    };
 }
 
 /// A general version of Option::unwrap for all enum variants.
