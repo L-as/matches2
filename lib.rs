@@ -171,7 +171,7 @@ macro_rules! assert_matches {
 #[macro_export]
 macro_rules! debug_assert_matches {
     ($expression:expr, $($pattern:pat)|* $(if $ifguard:expr)?) => {
-        if cfg!(debug_assertions) match $expression {
+        match $expression {
             $($pattern)|* $(if $ifguard)? => (),
             _ => panic!("assertion failed: `{:?}` does not match `{}`", $expression, stringify!($($pattern)|* $(if $ifguard)?))
         }
