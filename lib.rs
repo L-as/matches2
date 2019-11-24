@@ -37,9 +37,9 @@ macro_rules! matches {
     };
 }
 
-/// A general version of Option::unwrap for all enum variants.
+/// A general version of `Option::unwrap` for all enum variants.
 ///
-/// Syntax: `unwrap_match!(` *expression* `,` *pattern* `=>` *result* [, *error message* ]`)`
+/// Syntax: `unwrap_match!(` *expression* `,` *pattern* `=>` *result* [ `,` *error message* ] `)`
 ///
 /// The macro evaluates to *result* if *pattern* matches, otherwise it panics with the *error message* or a default one
 /// that contains the pattern in it.
@@ -79,9 +79,11 @@ macro_rules! unwrap_match {
     };
 }
 
-/// Returns Option::Some if pattern matches with the inner value, or Option::None otherwise
+/// Returns `Option::Some` if the pattern matches with the given value, or `Option::None` otherwise
 ///
 /// This macro is especially useful with `Iterator::filter_map`.
+/// 
+/// Syntax: `option_match!(` *expression* `,` *pattern* `=>` *result* `)`
 ///
 /// # Examples
 /// ```
@@ -113,7 +115,7 @@ macro_rules! option_match {
 
 /// Assert that an expression matches a refutable pattern.
 ///
-/// Syntax: `assert_matches!(` *expression* `,` *pattern* [, *error message* ]`)`
+/// Syntax: `assert_matches!(` *expression* `,` *pattern* [ `,` *error message* ] `)`
 ///
 /// If the pattern does not match, this macro panics with the given error message or a default one
 /// that contains the pattern in it.
@@ -148,7 +150,7 @@ macro_rules! assert_matches {
 
 /// Assert that an expression matches a refutable pattern using debug assertions.
 ///
-/// Syntax: `debug_assert_matches!(` *expression* `,` *pattern* [, *error message* ]`)`
+/// Syntax: `debug_assert_matches!(` *expression* `,` *pattern* [ `,` *error message* ] `)`
 ///
 /// If the pattern does not match while debug assertions are enabled, this macro panics with
 /// the given error message or a default one that contains the pattern in it.
